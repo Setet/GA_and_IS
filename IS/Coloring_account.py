@@ -21,6 +21,67 @@ def generate_random_graph(num_vertices):
     return graph
 
 
+def generate_initial_population(graph, num_colors, population_size):
+    population = []
+    for _ in range(population_size):
+        colors = {}
+        for vertex in graph:
+            colors[vertex] = random.randint(0, num_colors - 1)
+        population.append(colors)
+    return population
+
+
+def clone_solution(solution):
+    return solution.copy()
+
+
+def mutate_solution(solution, num_colors, mutation_rate):
+    mutated_solution = solution.copy()
+    for vertex in mutated_solution:
+        if random.random() < mutation_rate:
+            original_color = mutated_solution[vertex]
+            new_color = random.randint(0, num_colors - 1)
+            mutated_solution[vertex] = new_color if new_color != original_color else (new_color + 1) % num_colors
+    return mutated_solution
+
+
+def evaluate_solution(graph, solution):
+    num_colors_used = max(solution.values()) + 1
+    return num_colors_used
+
+
+def check_conflicts(graph, solution):
+    for vertex in graph:
+        color = solution[vertex]
+        for neighbor in graph[vertex]:
+            if solution[neighbor] == color:
+                return True
+    return False
+
+
+def immune_algorithm(graph, num_colors, population_size, num_generations, mutation_rate):
+    population = generate_initial_population(graph, num_colors, population_size)
+
+    for gen in range(num_generations):
+        new_population = []
+
+        for solution in population:
+            clone = clone_solution(solution)
+            mutated_solution = mutate_solution(solution, num_colors, mutation_rate)
+            if evaluate_solution(graph, mutated_solution) <= evaluate_solution(graph, clone) and not check_conflicts(
+                    graph, mutated_solution):
+                new_population.append(mutated_solution)
+            else:
+                new_population.append(clone)
+
+        population = new_population
+
+    best_solution = min(population, key=lambda x: evaluate_solution(graph, x))
+    best_num_colors = evaluate_solution(graph, best_solution)
+
+    return best_solution, best_num_colors
+
+
 # Функция для определения минимального количества цветов для раскраски графа
 def min_colors_needed(graph):
     colors = {}
@@ -34,53 +95,10 @@ def min_colors_needed(graph):
     return max(colors.values()) + 1
 
 
-# Функция реализации иммунного алгоритма с использованием жадной раскраски для оптимизации цветов
-def immune_algorithm(graph, num_colors, num_generations):
-    # Инициализация словаря best_colors для лучших цветов
-    # и переменной best_num_colors для лучшего числа цветов как бесконечности
-    best_colors = {}
-    best_num_colors = float('inf')
-    # Переменная для хранения предыдущего лучшего числа цветов
-    previous_best_num_colors = best_num_colors
-
-    # Цикл для проведения num_generations итераций
-    for gen in range(num_generations):
-        # Инициализация словаря colors для выбранных цветов на текущей итерации
-        colors = {}
-        # Цикл для каждой вершины в графе
-        for vertex in graph:
-            # Создается множество used_colors для хранения цветов соседей вершины
-            used_colors = set(colors.get(neighbour, None) for neighbour in graph[vertex])
-            # Цикл для перебора всех возможных цветов в диапазоне от 0 до num_colors
-            for color in range(num_colors):
-                # Проверка, если цвет не использовался у соседей текущей вершины
-                if color not in used_colors:
-                    colors[vertex] = color
-                    # Вывод результата каждой итерации
-                    print(f"Итерация: {gen} - вершина: {vertex} - цвет: {color}")
-                    break
-
-        # Определение количества использованных цветов на текущей итерации
-        num_colors_used = max(colors.values()) + 1
-        # Если текущее количество использованных цветов меньше лучшего найденного до этого
-        if num_colors_used < best_num_colors:
-            best_colors = colors
-            best_num_colors = num_colors_used
-
-        if previous_best_num_colors == best_num_colors:  # Проверка на изменение лучшего числа цветов
-            print("Улучшений нет, прекращаем итерации")
-            break
-
-        previous_best_num_colors = best_num_colors  # Обновляем предыдущее лучшее число цветов для следующей проверки
-
-    # Возвращение лучших цветов и лучшего числа цветов
-    return best_colors, best_num_colors
-
-
-def generating_graph():
+# Функция генерирует правильный граф
+def generating_graph(num_vertices):
     # Генерация случайного графа с заданным количеством вершин
-    num_vertices = random.randint(20, 21)
-    random_graph = generate_random_graph(num_vertices)
+    random_graph = generate_random_graph(int(num_vertices))
 
     # Создаем новый словарь с буквами в качестве ключей
     new_graph = {}
@@ -96,7 +114,7 @@ def generating_graph():
     return new_graph
 
 
-def coloring_account(graph):
+def coloring_account(graph, population_size, num_generations, mutation_rate):
     colors_list = ["Red", "Blue", "Green", "Yellow", "Purple", "Orange",
                    "Cyan", "Magenta", "Lime", "Pink", "Teal", "Indigo",
                    "Brown", "Silver", "Gold", "Violet", "Turquoise", "Coral",
@@ -106,13 +124,11 @@ def coloring_account(graph):
     for vertex, neighbors in graph.items():
         print(f"{chr(64 + vertex)} - {[chr(64 + neighbor) for neighbor in neighbors]}")'''
 
-    # Определение минимального количества цветов
-    min_colors = min_colors_needed(graph)
-    print(f"Мин кол-во цветов: {min_colors}\n")
-
     # Использование иммунного алгоритма для оптимизации цветов
-    num_generations = 100
-    optimized_colors, optimized_num_colors = immune_algorithm(graph, min_colors, num_generations)
+    num_colors = min_colors_needed(graph)
+    optimized_colors, optimized_num_colors = immune_algorithm(graph, num_colors, int(population_size),
+                                                              int(num_generations),
+                                                              float(mutation_rate))
 
     # Создаем пустой словарь
     new_optimized_graph = {}
@@ -126,6 +142,7 @@ def coloring_account(graph):
     for vertex, neighbors in new_optimized_graph.items():
         print(f"{vertex} - {neighbors}")
 
+    print(f"Минимальное количество цветов по функции: {num_colors}")
     print(f"Оптимизированное количество цветов: {optimized_num_colors}")
 
     return new_optimized_graph
