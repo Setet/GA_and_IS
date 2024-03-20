@@ -1,4 +1,5 @@
 import tkinter
+import time
 import tkinter as tk
 from tkinter import *
 from tkinter import scrolledtext, messagebox
@@ -33,7 +34,7 @@ def gui():
     def start():
         fig.clf()
         # Данные для графа из нового словаря
-        graph_dict = generating_graph(txt_4_window.get())
+        graph_dict = generating_graph(txt_4_window.get(), txt_5_window.get())
         color_graph = coloring_account(graph_dict, txt_1_window.get(), txt_2_window.get(), txt_3_window.get())
 
         # Создаем граф и добавляем узлы и связи
@@ -43,11 +44,23 @@ def gui():
             for neighbor in neighbors:
                 G.add_edge(node, neighbor)
 
-        # Отображение графа на tkinter canvas
         pos = nx.random_layout(G, seed=42)
+
+        # Отображение графа на tkinter canvas(нераскраш)
+        nx.draw(G, pos, with_labels=True, node_color='skyblue', edge_color='black', width=2, alpha=0.8)
+        canvas.draw()
+
+        window.update()
+
+        # Задержка в сек
+        time.sleep(10)
+
+        fig.clf()
+        # Отображение графа на tkinter canvas(рас)
         draw_colored_graph(G, pos, color_graph)
         canvas.draw()
 
+        window.update()
         messagebox.showinfo('Уведомление', 'Готово')
 
     def delete_lab():
