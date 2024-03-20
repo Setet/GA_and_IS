@@ -2,21 +2,23 @@ import random
 
 
 # Функция для генерации случайного графа с заданным количеством вершин
-def generate_random_graph(num_vertices):
+def generate_random_graph(num_vertices, num_edges):
     graph = {}
-    for vertex in range(1, num_vertices + 1):
-        if vertex not in graph:
-            graph[vertex] = []
+    edges = 0
 
-        # Генерация случайного количества соседей для вершины
-        for _ in range(random.randint(1, num_vertices // 2)):
-            neighbor = random.randint(1, num_vertices)
-            if neighbor != vertex and neighbor not in graph[vertex] and vertex not in graph.get(neighbor, []):
-                graph[vertex].append(neighbor)
-                if neighbor not in graph:
-                    graph[neighbor] = [vertex]
-                else:
-                    graph[neighbor].append(vertex)
+    while edges < num_edges:
+        v1 = random.randint(1, num_vertices)
+        v2 = random.randint(1, num_vertices)
+
+        if v1 != v2 and v2 not in graph.get(v1, []):
+            if v1 not in graph:
+                graph[v1] = []
+            if v2 not in graph:
+                graph[v2] = []
+
+            graph[v1].append(v2)
+            graph[v2].append(v1)
+            edges += 1
 
     return graph
 
@@ -102,9 +104,9 @@ def min_colors_needed(graph):
 
 
 # Функция генерирует правильный граф
-def generating_graph(num_vertices):
+def generating_graph(num_vertices, num_edges):
     # Генерация случайного графа с заданным количеством вершин
-    random_graph = generate_random_graph(int(num_vertices))
+    random_graph = generate_random_graph(int(num_vertices), int(num_edges))
 
     # Создаем новый словарь с буквами в качестве ключей
     new_graph = {}
