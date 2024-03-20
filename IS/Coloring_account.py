@@ -21,6 +21,7 @@ def generate_random_graph(num_vertices):
     return graph
 
 
+# Функция начальной популяции
 def generate_initial_population(graph, num_colors, population_size):
     population = []
     for _ in range(population_size):
@@ -31,10 +32,12 @@ def generate_initial_population(graph, num_colors, population_size):
     return population
 
 
+# Функция клонирования решений
 def clone_solution(solution):
     return solution.copy()
 
 
+# Функция мутации решений
 def mutate_solution(solution, num_colors, mutation_rate):
     mutated_solution = solution.copy()
     for vertex in mutated_solution:
@@ -45,11 +48,13 @@ def mutate_solution(solution, num_colors, mutation_rate):
     return mutated_solution
 
 
+# Функция эволюции решений
 def evaluate_solution(graph, solution):
     num_colors_used = max(solution.values()) + 1
     return num_colors_used
 
 
+# Функция проверки конфликтов ребёр
 def check_conflicts(graph, solution):
     for vertex in graph:
         color = solution[vertex]
@@ -59,6 +64,7 @@ def check_conflicts(graph, solution):
     return False
 
 
+# Функция иммунного алгоритма
 def immune_algorithm(graph, num_colors, population_size, num_generations, mutation_rate):
     population = generate_initial_population(graph, num_colors, population_size)
 
