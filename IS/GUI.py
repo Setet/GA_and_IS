@@ -1,12 +1,10 @@
 import tkinter
 import tkinter as tk
 from tkinter import *
-from tkinter import scrolledtext
-from tkinter.ttk import Notebook
+from tkinter import scrolledtext, messagebox
 
 import networkx as nx
 import matplotlib.pyplot as plt
-from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from Coloring_account import coloring_account, generating_graph
@@ -18,31 +16,7 @@ def draw_colored_graph(G, pos, color_dict):
     nx.draw(G, pos, with_labels=True, node_color=node_colors, edge_color='black', width=2, alpha=0.8)
 
 
-def main():
-    def start():
-        # Данные для графа из нового словаря
-        graph_dict = generating_graph(txt_4_window.get())
-        color_graph = coloring_account(graph_dict, txt_1_window.get(), txt_2_window.get(), txt_3_window.get())
-
-        # Создаем граф и добавляем узлы и связи
-        G = nx.Graph()
-        for node, neighbors in graph_dict.items():
-            G.add_node(node)
-            for neighbor in neighbors:
-                G.add_edge(node, neighbor)
-
-        # Отображение графа на tkinter canvas
-        fig, ax = plt.subplots()
-        pos = nx.random_layout(G, seed=42)
-        draw_colored_graph(G, pos, color_graph)
-
-        canvas = FigureCanvasTkAgg(fig, master=window)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
-
-    def delete_lab():
-        txt_window.delete(1.0, END)
-
+def gui():
     window = Tk()
 
     width = window.winfo_screenwidth()
@@ -56,6 +30,29 @@ def main():
     canvas.draw()
     canvas.get_tk_widget().pack(side=tkinter.LEFT, fill=tkinter.BOTH)
 
+    def start():
+        fig.clf()
+        # Данные для графа из нового словаря
+        graph_dict = generating_graph(txt_4_window.get())
+        color_graph = coloring_account(graph_dict, txt_1_window.get(), txt_2_window.get(), txt_3_window.get())
+
+        # Создаем граф и добавляем узлы и связи
+        G = nx.Graph()
+        for node, neighbors in graph_dict.items():
+            G.add_node(node)
+            for neighbor in neighbors:
+                G.add_edge(node, neighbor)
+
+        # Отображение графа на tkinter canvas
+        pos = nx.random_layout(G, seed=42)
+        draw_colored_graph(G, pos, color_graph)
+        canvas.draw()
+
+        messagebox.showinfo('Уведомление', 'Готово')
+
+    def delete_lab():
+        txt_window.delete(1.0, END)
+
     main_f_window = LabelFrame(window, text="Параметры")
     left_f_window = Frame(main_f_window)
     right_f_window = Frame(main_f_window)
@@ -63,7 +60,7 @@ def main():
 
     lbl_1_window = Label(left_f_window, text="Размер популяции")
     lbl_2_window = Label(left_f_window, text="Кол-во итераций")
-    lbl_3_window = Label(left_f_window, text="Кофициент мутации")
+    lbl_3_window = Label(left_f_window, text="Коэффициент мутации")
     lbl_4_window = Label(left_f_window, text="Кол-во вершин")
     lbl_5_window = Label(left_f_window, text="Кол-во рёбер")
 
@@ -103,4 +100,4 @@ def main():
     tk.mainloop()
 
 
-main()
+gui()
