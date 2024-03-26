@@ -11,6 +11,24 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from Coloring_account import coloring_account, generating_graph, check_graph_coloring
 
 
+# Функция для определения минимального количества цветов для раскраски графа
+def min_colors_needed(graph):
+    colors = {}
+    for vertex in graph:
+        used_colors = set(colors.get(neighbour, None) for neighbour in graph[vertex])
+        for color in range(len(used_colors) + 1):
+            if color not in used_colors:
+                colors[vertex] = color
+                break
+
+    return max(colors.values()) + 1
+
+
+def color_need(color_graph):
+    unique_colors = set(color_graph.values())
+    return len(unique_colors)
+
+
 # Функция осн интерфейса
 def gui():
     # Инициализация окна
@@ -75,6 +93,10 @@ def gui():
         scrolled_text.insert(INSERT, "Раскрашенный граф:\n")
         for vertex, neighbors in color_graph.items():
             scrolled_text.insert(INSERT, f"{vertex} - {neighbors}\n")
+
+        scrolled_text.insert(INSERT, f"Минимально необходимое кол-во цветов: {min_colors_needed(graph_dict)}\n")
+
+        scrolled_text.insert(INSERT, f"Кол-во цветов нашего графа: {color_need(color_graph)}\n")
 
         if check_graph_coloring(graph_dict, color_graph):
             scrolled_text.insert(INSERT, "Раскраска графика правильная\n")
