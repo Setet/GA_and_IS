@@ -41,22 +41,6 @@ def generating_graph(num_vertices, num_edges):
     return new_graph
 
 
-# Функция для определения минимального количества цветов для раскраски графа
-def min_colors_needed(graph):
-    colors = {}
-    for vertex in graph:
-        used_colors = set(colors.get(neighbour, None) for neighbour in graph[vertex])
-        for color in range(len(used_colors) + 1):
-            if color not in used_colors:
-                colors[vertex] = color
-                break
-
-    return max(colors.values()) + 1
-
-
-import random
-
-
 # Функция начальной популяции
 def generate_initial_population(graph, population_size):
     population = []
@@ -138,7 +122,6 @@ def coloring_account(graph, population_size, num_generations, mutation_rate):
                    "Maroon", "Olive"]
 
     # Использование иммунного алгоритма для оптимизации цветов
-    num_colors = min_colors_needed(graph)
     optimized_colors, optimized_num_colors = immune_algorithm(graph, int(population_size),
                                                               int(num_generations),
                                                               float(mutation_rate))
