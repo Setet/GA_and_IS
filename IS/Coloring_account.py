@@ -1,26 +1,42 @@
 import random
 
 
+# Функция проверки всего графа на правильность раскраски
+def check_graph_coloring(graph, coloring):
+    for vertex, color in coloring.items():
+        for neighbor in graph[vertex]:
+            if coloring.get(neighbor) == color:
+                return False
+    return True
+
+
 # Функция для генерации случайного графа с заданным количеством вершин
 def generate_random_graph(num_vertices, num_edges):
-    graph = {}
-    edges = 0
+    graph = {vertex: [] for vertex in range(num_vertices)}
 
-    while edges < num_edges:
-        v1 = random.randint(1, num_vertices)
-        v2 = random.randint(1, num_vertices)
+    while num_edges > 0:
+        vertex1 = random.randint(0, num_vertices - 1)
+        vertex2 = random.randint(0, num_vertices - 1)
 
-        if v1 != v2 and v2 not in graph.get(v1, []):
-            if v1 not in graph:
-                graph[v1] = []
-            if v2 not in graph:
-                graph[v2] = []
-
-            graph[v1].append(v2)
-            graph[v2].append(v1)
-            edges += 1
+        if vertex1 != vertex2 and vertex2 not in graph[vertex1]:
+            graph[vertex1].append(vertex2)
+            graph[vertex2].append(vertex1)
+            num_edges -= 1
 
     return graph
+
+
+# Функция для определения минимального количества цветов для раскраски графа
+def min_colors_needed(graph):
+    colors = {}
+    for vertex in graph:
+        used_colors = set(colors.get(neighbour, None) for neighbour in graph[vertex])
+        for color in range(len(used_colors) + 1):
+            if color not in used_colors:
+                colors[vertex] = color
+                break
+
+    return max(colors.values()) + 1
 
 
 # Функция начальной популяции
@@ -90,20 +106,7 @@ def immune_algorithm(graph, num_colors, population_size, num_generations, mutati
     return best_solution, best_num_colors
 
 
-# Функция для определения минимального количества цветов для раскраски графа
-def min_colors_needed(graph):
-    colors = {}
-    for vertex in graph:
-        used_colors = set(colors.get(neighbour, None) for neighbour in graph[vertex])
-        for color in range(len(used_colors) + 1):
-            if color not in used_colors:
-                colors[vertex] = color
-                break
-
-    return max(colors.values()) + 1
-
-
-# Функция генерирует правильный граф
+# Функция генерирует красивый граф с символами
 def generating_graph(num_vertices, num_edges):
     # Генерация случайного графа с заданным количеством вершин
     random_graph = generate_random_graph(int(num_vertices), int(num_edges))
@@ -115,13 +118,10 @@ def generating_graph(num_vertices, num_edges):
         new_value = [chr(65 + num - 1) for num in value]  # Преобразуем числовые значения в буквы
         new_graph[new_key] = new_value
 
-    print("Граф:")
-    for vertex, neighbors in new_graph.items():
-        print(f"{vertex} - {neighbors}")
-
     return new_graph
 
 
+# Функция раскраски графа
 def coloring_account(graph, population_size, num_generations, mutation_rate):
     colors_list = ["Red", "Blue", "Green", "Yellow", "Purple", "Orange",
                    "Cyan", "Magenta", "Lime", "Pink", "Teal", "Indigo",
@@ -141,16 +141,12 @@ def coloring_account(graph, population_size, num_generations, mutation_rate):
     # Создаем пустой словарь
     new_optimized_graph = {}
 
-    print("Раскрашенный граф:")
     for vertex, color in optimized_colors.items():
         key = vertex
         value = f"{colors_list[color]}"
         new_optimized_graph[key] = value
 
-    for vertex, neighbors in new_optimized_graph.items():
-        print(f"{vertex} - {neighbors}")
-
-    print(f"Минимальное количество цветов по функции: {num_colors}")
-    print(f"Оптимизированное количество цветов: {optimized_num_colors}")
+    # print(f"Минимальное количество цветов по функции: {num_colors}")
+    # print(f"Оптимизированное количество цветов: {optimized_num_colors}")
 
     return new_optimized_graph
