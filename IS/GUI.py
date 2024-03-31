@@ -24,6 +24,7 @@ def min_colors_needed(graph):
     return max(colors.values()) + 1
 
 
+# Функция считает кол-во уникальных цветов у нашего графа
 def color_need(color_graph):
     unique_colors = set(color_graph.values())
     return len(unique_colors)
@@ -46,7 +47,7 @@ def gui():
 
     style = Style()
     style.theme_use("default")
-    style.configure("Label", font=('Arial', 20))
+    style.configure("Label", font=('Arial', 15))
     style.map("Label")
 
     # Рисую начальное пустое поле под граф
@@ -70,7 +71,10 @@ def gui():
         # Сам граф
         graph_dict = generating_graph(input_field_4.get(), input_field_5.get())
         # Цвета графа
-        color_graph = coloring_account(graph_dict, input_field_1.get(), input_field_2.get(), input_field_3.get())
+        color_graph, color_num_graph, time = coloring_account(graph_dict, input_field_1.get(), input_field_2.get(),
+                                                              input_field_3.get())
+
+        # print(graph_dict)
 
         scrolled_text.insert(INSERT, "Граф:\n")
         for vertex, neighbors in graph_dict.items():
@@ -86,7 +90,8 @@ def gui():
         pos = nx.random_layout(g, seed=42)
 
         # Отображение графа на tkinter canvas(не раскрашенный)
-        nx.draw(g, pos, with_labels=True, edge_color='black', width=2, alpha=0.8, ax=fig_1.gca())
+        nx.draw(g, pos, with_labels=True, node_color="white", edge_color='black', width=2, alpha=0.8, ax=fig_1.gca())
+
         # Рисую то что получилось
         canvas_1.draw()
 
@@ -96,7 +101,9 @@ def gui():
 
         scrolled_text.insert(INSERT, f"Минимально необходимое кол-во цветов: {min_colors_needed(graph_dict)}\n")
 
-        scrolled_text.insert(INSERT, f"Кол-во цветов нашего графа: {color_need(color_graph)}\n")
+        scrolled_text.insert(INSERT, f"Кол-во цветов нашего графа: {color_num_graph}\n")
+
+        scrolled_text.insert(INSERT, f"Время работы программы: {time} сек\n")
 
         if check_graph_coloring(graph_dict, color_graph):
             scrolled_text.insert(INSERT, "Раскраска графика правильная\n")
@@ -111,23 +118,23 @@ def gui():
 
         messagebox.showinfo('Уведомление', 'Готово')
 
-    main_frame = LabelFrame(window, text="Параметры", font=('Arial', 20))
+    main_frame = LabelFrame(window, text="Параметры", font=('Arial', 15))
 
     left_frame = Frame(main_frame)
     right_frame = Frame(main_frame)
-    console_frame = LabelFrame(window, text="Консоль лог", font=('Arial', 20))
+    console_frame = LabelFrame(window, text="Консоль лог", font=('Arial', 15))
 
-    label_1 = Label(left_frame, text="Размер популяции", font=('Arial', 20))
-    label_2 = Label(left_frame, text="Кол-во итераций", font=('Arial', 20))
-    label_3 = Label(left_frame, text="Коэффициент мутации", font=('Arial', 20))
-    label_4 = Label(left_frame, text="Кол-во вершин", font=('Arial', 20))
-    label_5 = Label(left_frame, text="Кол-во рёбер", font=('Arial', 20))
+    label_1 = Label(left_frame, text="Размер популяции", font=('Arial', 15))
+    label_2 = Label(left_frame, text="Кол-во итераций", font=('Arial', 15))
+    label_3 = Label(left_frame, text="Коэффициент мутации", font=('Arial', 15))
+    label_4 = Label(left_frame, text="Кол-во вершин", font=('Arial', 15))
+    label_5 = Label(left_frame, text="Кол-во рёбер", font=('Arial', 15))
 
-    input_field_1 = Entry(right_frame, font=('Arial', 20))
-    input_field_2 = Entry(right_frame, font=('Arial', 20))
-    input_field_3 = Entry(right_frame, font=('Arial', 20))
-    input_field_4 = Entry(right_frame, font=('Arial', 20))
-    input_field_5 = Entry(right_frame, font=('Arial', 20))
+    input_field_1 = Entry(right_frame, font=('Arial', 15))
+    input_field_2 = Entry(right_frame, font=('Arial', 15))
+    input_field_3 = Entry(right_frame, font=('Arial', 15))
+    input_field_4 = Entry(right_frame, font=('Arial', 15))
+    input_field_5 = Entry(right_frame, font=('Arial', 15))
 
     input_field_1.insert(0, "50")
     input_field_2.insert(0, "100")
@@ -135,10 +142,10 @@ def gui():
     input_field_4.insert(0, "10")
     input_field_5.insert(0, "5")
 
-    scrolled_text = scrolledtext.ScrolledText(console_frame, font=('Arial', 20))
+    scrolled_text = scrolledtext.ScrolledText(console_frame, font=('Arial', 15))
 
     run_button = Button(window, text="Выполнить", foreground="black", background="blue", command=start,
-                        font=('Arial', 20))
+                        font=('Arial', 15))
 
     main_frame.pack(side=TOP, padx=5, pady=5, fill=BOTH, expand=True)
     left_frame.pack(side=LEFT, fill=BOTH, expand=True)
