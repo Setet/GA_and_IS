@@ -1,4 +1,5 @@
 import random
+import timeit
 
 
 # Функция проверки всего графа на правильность раскраски
@@ -31,11 +32,15 @@ def generating_graph(num_vertices, num_edges):
     # Генерация случайного графа с заданным количеством вершин
     random_graph = generate_random_graph(int(num_vertices), int(num_edges))
 
+    # print(random_graph)
+
     # Создаем новый словарь с буквами в качестве ключей
     new_graph = {}
     for key, value in random_graph.items():
-        new_key = chr(65 + key - 1)  # Преобразуем числовой ключ в букву ('A', 'B', 'C', ...)
-        new_value = [chr(65 + num - 1) for num in value]  # Преобразуем числовые значения в буквы
+        # Преобразуем числовой ключ в букву ('A', 'B', 'C', ...)
+        new_key = chr(66 + key - 1)
+        # Преобразуем числовые значения в буквы
+        new_value = [chr(66 + num - 1) for num in value]
         new_graph[new_key] = new_value
 
     return new_graph
@@ -44,7 +49,8 @@ def generating_graph(num_vertices, num_edges):
 # Функция начальной популяции
 def generate_initial_population(graph, population_size):
     population = []
-    num_colors = max(len(graph), 3)  # Минимальное количество цветов равно 3
+    # Минимальное количество цветов равно 3
+    num_colors = max(len(graph), 3)
     for _ in range(population_size):
         colors = {}
         for vertex in graph:
@@ -81,12 +87,10 @@ def check_conflicts(graph, solution):
 
 
 # Функция используется для оценки качества
-# В контексте данной задачи, функция evaluate_solution возвращает количество уникальных цветов,
+# В рамках данной задачи, функция evaluate_solution возвращает количество уникальных цветов,
 # которые были использованы в решении.
-
-# Это количество цветов служит одной из метрик качества решения задачи раскраски графа.
 # Чем меньше цветов используется, тем лучше решение с точки зрения минимизации количества используемых цветов.
-def evaluate_solution(graph, solution):
+def evaluate_solution(solution):
     return len(set(solution.values()))
 
 
@@ -100,7 +104,7 @@ def immune_algorithm(graph, population_size, num_generations, mutation_rate):
         for solution in population:
             clone = clone_solution(solution)
             mutated_solution = mutate_solution(solution, mutation_rate)
-            if evaluate_solution(graph, mutated_solution) <= evaluate_solution(graph, clone) and not check_conflicts(
+            if evaluate_solution(mutated_solution) <= evaluate_solution(clone) and not check_conflicts(
                     graph, mutated_solution):
                 new_population.append(mutated_solution)
             else:
@@ -108,33 +112,42 @@ def immune_algorithm(graph, population_size, num_generations, mutation_rate):
 
         population = new_population
 
-    best_solution = min(population, key=lambda x: evaluate_solution(graph, x))
-    best_num_colors = evaluate_solution(graph, best_solution)
+    best_solution = min(population, key=lambda x: evaluate_solution(x))
+    best_num_colors = evaluate_solution(best_solution)
 
     return best_solution, best_num_colors
 
 
 # Функция раскраски графа
 def coloring_account(graph, population_size, num_generations, mutation_rate):
-    colors_list = ["Red", "Blue", "Green", "Yellow", "Purple", "Orange",
-                   "Cyan", "Magenta", "Lime", "Pink", "Teal", "Indigo",
-                   "Brown", "Silver", "Gold", "Violet", "Turquoise", "Coral",
-                   "Maroon", "Olive"]
+    colors_list = [
+        "Red", "Blue", "Green", "Yellow", "Purple",
+        "Orange", "Cyan", "Magenta", "Lime", "Pink",
+        "Teal", "Indigo", "Brown", "Silver", "Gold",
+        "Violet", "Coral", "Maroon", "Olive"
+    ]
+
+    # Отчёт времени работы иммунного алгоритма
+    time_start = timeit.default_timer()
 
     # Использование иммунного алгоритма для оптимизации цветов
-    optimized_colors, optimized_num_colors = immune_algorithm(graph, int(population_size),
+    optimized_colors, optimized_num_colors = immune_algorithm(graph,
+                                                              int(population_size),
                                                               int(num_generations),
                                                               float(mutation_rate))
+    # Завершение работы иммунного алгоритма
+    time_over = timeit.default_timer()
+
+    # Время работы программы
+    time = round(time_over - time_start, 4)
 
     # Создаем пустой словарь
     new_optimized_graph = {}
 
+    # Заполняем словарь цветами
     for vertex, color in optimized_colors.items():
         key = vertex
         value = f"{colors_list[color]}"
         new_optimized_graph[key] = value
 
-    # print(f"Минимальное количество цветов по функции: {num_colors}")
-    # print(f"Оптимизированное количество цветов: {optimized_num_colors}")
-
-    return new_optimized_graph
+    return new_optimized_graph, optimized_num_colors, time
