@@ -95,6 +95,10 @@ def gui():
         # Рисую то что получилось
         canvas_1.draw()
 
+        # Это для сохранения графа в памяти компа
+        # canvas_1.print_jpg('graph_1.jpg')
+        # canvas_1.figure.savefig('graph_1.jpg')
+
         scrolled_text.insert(INSERT, "Раскрашенный граф:\n")
         for vertex, neighbors in color_graph.items():
             scrolled_text.insert(INSERT, f"{vertex} - {neighbors}\n")
@@ -115,6 +119,9 @@ def gui():
         nx.draw(g, pos, with_labels=True, node_color=node_colors, edge_color='black', width=2, alpha=0.8,
                 ax=fig_2.gca())
         canvas_2.draw()
+
+        # canvas_2.print_jpg('graph_2.jpg')
+        # canvas_2.figure.savefig('graph_2.jpg')
 
         messagebox.showinfo('Уведомление', 'Готово')
 
